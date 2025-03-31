@@ -30,10 +30,15 @@ int main ()
     disp=al_create_display (800, 600);
     al_set_window_title (disp, "Meowstellar");
     eventos= al_create_event_queue();
+    menuFuente= al_load_font("Desktop\\",  32, 0);
     al_register_event_source(eventos, al_get_display_event_source(disp));
     al_register_event_source(eventos, al_get_keyboard_event_source());
     while (fin==0)
     {
+      if (al_event_queue_is_empty(eventos))
+      {
+        al_draw_text (menuFuente, al_map_rgb(255, 255, 255),400, 300, 0, "MENÚ");
+      }
       al_wait_for_event;
       switch (evento.type)
       {
