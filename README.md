@@ -8,6 +8,7 @@ int main ()
   ALLEGRO_EVENT_QUEUE*eventos;
   ALLEGRO_EVENT evento;
   ALLEGRO_FONT menuFuente;
+  ALLEGRO_BITMAP *fondoMenu;
   int fin=0;
   if (!al_init())
   {
@@ -45,6 +46,7 @@ int main ()
     al_destroy_event_queue(eventos);
     al_destroy_display(disp);
     al_destroy_font(menuFuente);
+    al_destroy_bitmap (fondoMenu);
   }
   return 0;
 }
