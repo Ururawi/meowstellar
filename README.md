@@ -14,7 +14,7 @@ int main ()
   ALLEGRO_EVENT_QUEUE*eventos;
   ALLEGRO_EVENT evento;
   ALLEGRO_FONT menuFuente, menuFuent2;
-  ALLEGRO_BITMAP *fondoMenu, *vestIcono;
+  ALLEGRO_BITMAP *fondoMenu, *vestIcono, *iconoJuego;
   int fin=0;
   if (!al_init())
   {
@@ -39,6 +39,8 @@ int main ()
     menuFuente= al_load_font("Desktop\\Starborn.ttf",  60, 0);
     menuFuent2= al_load_font("Desktop\\Starborn.ttf",  40, 0);
     vestIcono=al_load_bitmap("");
+    iconoJuego=al_load_bitmap("C:\\Users\\LACE\\Desktop\\.png");
+    al_set_display_icon(disp, iconoJuego);
     al_register_event_source(eventos, al_get_display_event_source(disp));
     al_register_event_source(eventos, al_get_keyboard_event_source());
     while (fin==0)
@@ -66,6 +68,7 @@ int main ()
     al_destroy_font(menuFuent2);
     al_destroy_bitmap (fondoMenu);
     al_destroy_bitmap (vestIcono);
+    al_destroy_bitmap (iconoJuego);
   }
   return 0;
 }
