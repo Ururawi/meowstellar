@@ -13,5 +13,10 @@ int main ()
     printf("No ALLEGRO");
     fin=1;
   }
+  if (!al_install_keyboard())
+  {
+    printf ("No TECLADO");
+    fin=1;
+  }
   return 0;
 }
