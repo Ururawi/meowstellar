@@ -36,8 +36,8 @@ int main ()
     disp=al_create_display (800, 600);
     al_set_window_title (disp, "Meowstellar");
     eventos= al_create_event_queue();
-    menuFuente= al_load_font("Desktop\\",  60, 0);
-    menuFuent2= al_load_font("Desktop\\",  40, 0);
+    menuFuente= al_load_font("Desktop\\Starborn.ttf",  60, 0);
+    menuFuent2= al_load_font("Desktop\\Starborn.ttf",  40, 0);
     vestIcono=al_load_bitmap("");
     al_register_event_source(eventos, al_get_display_event_source(disp));
     al_register_event_source(eventos, al_get_keyboard_event_source());
@@ -63,7 +63,9 @@ int main ()
     al_destroy_event_queue(eventos);
     al_destroy_display(disp);
     al_destroy_font(menuFuente);
+    al_destroy_font(menuFuent2);
     al_destroy_bitmap (fondoMenu);
+    al_destroy_bitmap (vestIcono);
   }
   return 0;
 }
