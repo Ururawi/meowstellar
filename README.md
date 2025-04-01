@@ -2,7 +2,34 @@
 #include <allegro5\allegro.h>
 #include <allegro5\allegro_font.h>
 #include <allegro5\allegro_ttf.h>
+ void incia()
+    {
+        int fin = 0,i,e;
+        char cambio=0;
+        //1=verdadero, 0=falso
 
+        if(al_init()==0)
+        {
+            printf("No se pudo incicializar allegro");
+            fin=1;
+        }
+        if(al_init_primitives_addon()==0)
+        {
+            printf("No se pudo inicializar primitives");
+            fin=1;
+        }
+
+        if(!al_install_keyboard())
+        {
+            printf("No se inicializ%C el teclado", 162);
+            fin=1;
+        }
+        if (!al_init_font_addon() || !al_init_ttf_addon())
+        {
+            printf ("\nNo se pudo cargar la fuente");
+            fin=1;
+        }
+    }
 void menu()
 {
   return;
@@ -16,21 +43,7 @@ int main ()
   ALLEGRO_FONT menuFuente, menuFuent2;
   ALLEGRO_BITMAP *fondoMenu, *vestIcono, *iconoJuego;
   int fin=0;
-  if (!al_init())
-  {
-    printf("No ALLEGRO");
-    fin=1;
-  }
-  if (!al_install_keyboard())
-  {
-    printf ("No TECLADO");
-    fin=1;
-  }
-  if (!al_init_font_addon() || !al_init_ttf_addon())
-  {
-      printf ("\nNo se pudo cargar la fuente");
-      fin=1;
-  }
+  inicia();
   if (fin==0)
   {
     disp=al_create_display (800, 600);
