@@ -2,7 +2,7 @@
 #include <allegro5\allegro.h>
 #include <allegro5\allegro_font.h>
 #include <allegro5\allegro_ttf.h>
-void incia()
+void inicia()
  {
     int fin = 0,i,e;
     char cambio=0;
