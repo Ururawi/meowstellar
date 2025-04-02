@@ -8,12 +8,12 @@ void inicia()
     char cambio=0;
     //1=verdadero, 0=falso
  
-    if(!al_init()==0)
+    if(!al_init())
     {
         printf("No se pudo incicializar allegro");
         fin=1;
     }
-    if(!al_init_primitives_addon()==0)
+    if(!al_init_primitives_addon())
     {
         printf("No se pudo inicializar primitives");
         fin=1;
