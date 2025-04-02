@@ -8,12 +8,12 @@ void inicia()
     char cambio=0;
     //1=verdadero, 0=falso
  
-    if(al_init()==0)
+    if(!al_init()==0)
     {
         printf("No se pudo incicializar allegro");
         fin=1;
     }
-    if(al_init_primitives_addon()==0)
+    if(!al_init_primitives_addon()==0)
     {
         printf("No se pudo inicializar primitives");
         fin=1;
@@ -40,7 +40,7 @@ int main ()
   ALLEGRO_DISPLAY* disp;
   ALLEGRO_EVENT_QUEUE*eventos;
   ALLEGRO_EVENT evento;
-  ALLEGRO_FONT menuFuente, menuFuent2;
+  ALLEGRO_FONT *menuFuente, *menuFuent2;
   ALLEGRO_BITMAP *fondoMenu, *vestIcono, *iconoJuego;
   int fin=0;
   inicia();
