@@ -3,7 +3,6 @@
 #include<allegro5\allegro_image.h>
 //#include<allegro5\allegro_font.h>
 //#include<allegro5\allegro_ttf.h>
-//#include<allegro5\allegro_primitives.h>
 
 void inicializar()
 {
@@ -13,20 +12,12 @@ void inicializar()
         printf("No se pudo incicializar allegro");
         fin=1;
     }
-    /*if(al_init_primitives_addon()==0)
-    {
-        printf("No se pudo inicializar primitives");
-        fin=1;
-    }*/
 
     if(!al_install_keyboard())
     {
         printf("No se inicializ%C el teclado", 162);
         fin=1;
     }
-    
-    //al_init_font_addon();   //iniciar fuentes
-    //al_init_ttf_addon();    //iniciar ttf
     al_init_image_addon(); //iniciar las imágenes
     return; 
 }
@@ -48,7 +39,7 @@ cuadros coordenadas[4][3] = //matriz
     { {330,  32, 109, 150}, {451, 33, 109, 150}, {580,  30, 109, 150} }, // Derecha
     { {580, 219, 109, 150}, {460, 222, 109, 150}, {331, 216, 109, 150} }, // Izquierda
     { {331, 405, 109, 150}, {453, 420, 109, 150}, {588, 406, 109, 150} }, // Arriba
-    { {326, 586, 109, 150}, {455, 594, 109, 150}, {598, 597, 109, 150} }  // Abajo
+    { {455, 594, 109, 150},{326, 586, 109, 150}, {598, 597, 109, 150} }  // Abajo
   
 };
 
@@ -112,20 +103,20 @@ int main()
             }
             if (mizq) 
             {
-                x -= 4;
+                x -= 6;
                 if (x < 0) x = 0;
                 orienta = CIZQUIERDA;
                 camina = 1;
             }
             if (marrib) {
-                y -= 4;
+                y -= 6;
                 if (y < 0) y = 0;
                 orienta = CARRIBA;
                 camina = 1;
             }
             if (mabaj) 
             {
-                y += 4;
+                y += 6;
                 if (y > 620) y = 620;
                 orienta = CABAJO;
                 camina = 1;
@@ -198,3 +189,5 @@ int main()
 
     return 0;
 }
+
+
