@@ -63,13 +63,13 @@ int main()
     ALLEGRO_EVENT evento;
     ALLEGRO_BITMAP *gato;
     ALLEGRO_TIMER *tempocar;
-    int fin =0;
+    
     
     disp=al_create_display(1000,700); //generar disp
     al_set_window_title (disp, "Meowstellar");//nombre de la ventana
     eventos = al_create_event_queue(); //eventos->crear cola de eventos
 
-    tempocar=al_create_timer(0.1);
+    tempocar=al_create_timer(0.08);
 
     al_register_event_source(eventos, al_get_timer_event_source(tempocar));
     al_register_event_source(eventos, al_get_display_event_source(disp)); //¿de dónde vienen los eventos?
@@ -78,11 +78,9 @@ int main()
     al_start_timer(tempocar);
 
     int actual = 0; //cuadro que se esté usando
-    int orienta = CABAJO;
-    int x=472, y=312;
-
-    int camina = 0;
-    int otravez = 0;
+    int orienta = CABAJO, x=472, y=312;
+    int fin =0,camina=0, otravez=0;
+    int mdere= 0, mizq=0, marrib=0, mabaj=0;
     
     gato=al_load_bitmap("carnaran.png");
     if(!gato)
@@ -105,45 +103,78 @@ int main()
                 break;
 
             case ALLEGRO_EVENT_TIMER:
-                if (camina)
-                    actual = (actual + 1) % 3;
-                else
-                    actual = 0;
+            if (mdere) 
+            {
+                x += 6;
+                if (x > 950) x = 950;
+                orienta = CDERECHA;
+                camina = 1;
+            }
+            if (mizq) 
+            {
+                x -= 4;
+                if (x < 0) x = 0;
+                orienta = CIZQUIERDA;
+                camina = 1;
+            }
+            if (marrib) {
+                y -= 4;
+                if (y < 0) y = 0;
+                orienta = CARRIBA;
+                camina = 1;
+            }
+            if (mabaj) 
+            {
+                y += 4;
+                if (y > 620) y = 620;
+                orienta = CABAJO;
+                camina = 1;
+            }
 
-                otravez = 1;
-                break;
+            if (camina)
+                actual = (actual + 1) % 3;
+            else
+                actual = 0;
 
-            case ALLEGRO_EVENT_KEY_CHAR:
-                camina=1;
-                if(evento.keyboard.keycode == 83)//Derecha
-                {
-                    orienta = CDERECHA;
-                    if(x+4<950)
-                    x += 4;
-                }
-                if(evento.keyboard.keycode == 82)//izquierda
-                {
-                    orienta = CIZQUIERDA;
-                    if(x-4>0)
-                    x -= 4;
-                }
-                if(evento.keyboard.keycode == 84)//arriba
-                {
-                    orienta = CARRIBA;
-                    if(y-4>0)
-                    y -= 4;
-                }
-                if(evento.keyboard.keycode == 85)//abajo
-                {
-                    orienta = CABAJO;
-                    if(y+4<620)
-                    y += 4;
-                }
-                break;
+            otravez = 1;
+            break;
 
-            case ALLEGRO_EVENT_KEY_UP:
-                camina = 0;
-                break;
+            case ALLEGRO_EVENT_KEY_DOWN:
+            switch (evento.keyboard.keycode) 
+            {
+                case ALLEGRO_KEY_RIGHT:
+                    mdere = 1;
+                    break;
+                case ALLEGRO_KEY_LEFT:
+                    mizq = 1;
+                    break;
+                case ALLEGRO_KEY_UP:
+                    marrib = 1;
+                    break;
+                case ALLEGRO_KEY_DOWN:
+                    mabaj = 1;
+                    break;
+            }
+            break;
+        
+        case ALLEGRO_EVENT_KEY_UP:
+            switch (evento.keyboard.keycode) {
+                case ALLEGRO_KEY_RIGHT:
+                    mdere = 0;
+                    break;
+                case ALLEGRO_KEY_LEFT:
+                    mizq = 0;
+                    break;
+                case ALLEGRO_KEY_UP:
+                    marrib = 0;
+                    break;
+                case ALLEGRO_KEY_DOWN:
+                    mabaj = 0;
+                    break;
+            }
+            if (!mdere && !mizq&& !marrib && !mabaj)
+                    camina = 0;
+            break;
         }
 
         if (otravez && al_is_event_queue_empty(eventos)) 
@@ -167,5 +198,3 @@ int main()
 
     return 0;
 }
-
-
