@@ -178,13 +178,13 @@ int main()
                             printf("Perdiste\n");
                             corre=0;
                         }
-                        // Para repetirlo
+                        // rep
                         if (obstaculos[i].x < 0 || obstaculos[i].x > ldisp ||obstaculos[i].y < 0 || obstaculos[i].y > adisp) 
                         {
                             apobs(&obstaculos[i]);
                         }
                     }
-                    //salen los obstaculos
+                    // salen obstaculos
                 }
             }
             if (ganaste && obsal(obstaculos)) 
