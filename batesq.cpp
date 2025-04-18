@@ -140,7 +140,7 @@ int main()
             if (!ganaste) 
             {
                 // Para moversw
-                if (evento.keyboard.keycode==84 && estambre.y-tamest>0)
+                if(al_key_down(&tecla, 84) && estambre.y-tamest>0)
                 {
                     estambre.y -= estambre.vel;
                 }
