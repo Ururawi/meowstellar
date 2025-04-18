@@ -184,7 +184,7 @@ int main()
                             apobs(&obstaculos[i]);
                         }
                     }
-                    // Si el jugador ya ganó, las balas siguen saliendo sin reiniciarse
+                    //salen los obstaculos
                 }
             }
             if (ganaste && obsal(obstaculos)) 
