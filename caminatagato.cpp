@@ -158,7 +158,7 @@ int main()
                 }
                 if(mabaj) 
                 { 
-                    if(y+8<700)
+                    if(y+8<630)
                     {
                         y+=8; 
                         orienta=movabaj; 
