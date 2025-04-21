@@ -1,0 +1,366 @@
+#include<stdio.h>
+#include<allegro5\allegro.h>
+#include<allegro5\allegro_image.h>
+#include<allegro5\allegro_primitives.h>
+#include <allegro5\allegro_font.h>
+#include <allegro5\allegro_ttf.h>
+#define LARGO 1000
+#define ALTO 700
+#define FILAS 20
+#define COLUMNAS 30
+#define TAM_CELDA_LARGO (LARGO / COLUMNAS)
+#define TAM_CELDA_ALTO (ALTO / FILAS)
+void inicializar()
+{
+    int fin=0;
+    if(al_init()==0)
+    {
+        printf("No se pudo incicializar allegro");
+        fin=1;
+    }
+    if(al_init_primitives_addon()==0)
+    {
+        printf("No se pudo inicializar primitives");
+        fin=1;
+    }
+    if(!al_install_keyboard())
+    {
+        printf("No se inicializ%C el teclado", 162);
+        fin=1;
+    }
+    if(!al_init_image_addon()) //iniciar las imágenes
+    {
+        printf("No se pudo inicializar las imagenes");
+        fin=1;
+    }
+    return ; 
+}
+// Laberinto (1 = pared, 0 = espacio vacío)
+int laberinto[FILAS][COLUMNAS] = 
+{
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1},
+    {1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1},
+    {1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1},
+    {1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1},
+    {1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1},
+    {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1},
+    {1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1},
+    {1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1},
+    {1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1},
+    {1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+};
+
+int laberinto2[FILAS][COLUMNAS] = {
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1},
+    {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+    {1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1},
+    {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1},
+    {1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1},
+    {1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1},
+    {1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+};
+
+int laberinto3[FILAS][COLUMNAS] = {
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1},
+    {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1},
+    {1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
+    {1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1},
+    {1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+};
+
+// Función para dibujar el laberinto
+void dibujar_laberinto(int laberinto[FILAS][COLUMNAS]) 
+{
+    for (int i = 0; i < FILAS; i++) 
+    {
+        for (int j = 0; j < COLUMNAS; j++) 
+        {
+            if (laberinto[i][j] == 1) 
+            {
+                al_draw_filled_rectangle(j * TAM_CELDA_LARGO, i * TAM_CELDA_ALTO, (j + 1) * TAM_CELDA_LARGO, (i + 1) * TAM_CELDA_ALTO, al_map_rgb(0, 20, 30));
+            }
+        }
+    }
+}
+// Verificar colisión con las paredes
+int colision(int x, int y, int ancho, int alto, int laberinto[FILAS][COLUMNAS]) 
+{
+    // Verificar las cuatro esquinas del personaje
+    int fila1 = y / TAM_CELDA_ALTO;
+    int columna1 = x / TAM_CELDA_LARGO;
+
+    int fila2 = (y + alto - 1) / TAM_CELDA_ALTO;
+    int columna2 = (x + ancho - 1) / TAM_CELDA_LARGO;
+
+    // Verificar si alguna esquina está fuera de los límites del laberinto
+    if (fila1 < 0 || fila2 >= FILAS || columna1 < 0 || columna2 >= COLUMNAS) 
+    {
+        return 1; // Fuera de los límites
+    }
+
+    // Verificar si alguna esquina está en una pared
+    if (laberinto[fila1][columna1] == 1 || laberinto[fila1][columna2] == 1 ||laberinto[fila2][columna1] == 1 || laberinto[fila2][columna2] == 1) 
+    {
+        return 1; // Colisión con una pared
+    }
+
+    return 0; // No hay colisión
+}
+typedef struct 
+{
+    int sx, sy, sw, sh;
+} cuadros;
+
+enum orientacua 
+{
+    CDERECHA = 0,
+    CIZQUIERDA = 1,
+    CARRIBA = 2,
+    CABAJO = 3
+};
+cuadros coordenadas[4][3] = //matriz
+{
+    { {330,  32, 109, 150}, {451, 33, 109, 150}, {580,  30, 109, 150} }, // Derecha
+    { {331, 216, 109, 150}, {460, 222, 109, 150}, {580, 219, 109, 150} }, // Izquierda
+    { {331, 405, 109, 150}, {453, 420, 109, 150}, {588, 406, 109, 150} }, // Arriba
+    { {326, 586, 109, 150}, {455, 594, 109, 150}, {598, 597, 109, 150} }  // Abajo
+};
+int gganaste(int *ganaste, int x, int y, int nivel_actual)//esquina superior izquierda de la puerta (876,478)
+{
+    if(x>=872 && x<=928 && y>=478 && y<=552)// esquina inferior derecha de la puerta (928, 552), el limite para la puerta entre (872, 478) y (928, 552) es de 56x74 píxeles
+    {    
+        *ganaste=1;
+        printf("Ganaste\n");
+    }
+    return *ganaste;
+}
+void neblina(int x, int y, ALLEGRO_COLOR colorneblina)
+{
+    int al= 0;
+    for (int i = -50; i < 10000; i++) 
+    {
+        colorneblina = al_map_rgba(0, 0, 0, al);
+        al_draw_circle(x, y, i, colorneblina, 1);
+        if (al < 255) 
+        {
+            al += 1; // Incrementa la opacidad
+        }
+    }
+    return ;
+}
+void dibujanivel(int otravez, ALLEGRO_BITMAP *gato, ALLEGRO_BITMAP *puerta, int x, int y, float escala, cuadros f, ALLEGRO_BITMAP *piso, ALLEGRO_COLOR colorneblina, int laberinto[FILAS][COLUMNAS])
+{
+    otravez = 0;
+    al_draw_scaled_bitmap(piso, 0, 0, 1000, 700, 0, 0, LARGO, ALTO, 0); // Dibuja el fondo
+    al_draw_filled_rectangle(0, 0, LARGO, ALTO, al_map_rgba(0,0,0,80)); // Limpiar pantalla
+    dibujar_laberinto(laberinto);
+    al_draw_scaled_bitmap(puerta, 0, 0, 1024, 1024, 872, 478, 1024*.07, 1024*.07, 0);
+    al_draw_scaled_bitmap(gato, f.sx, f.sy, f.sw, f.sh, x, y, f.sw * escala, f.sh * escala, 0);
+    neblina(x, y, colorneblina);
+    printf("x: %d, y: %d\n", x, y);
+    al_flip_display();
+}
+void mostrar_next_round(int otravez, ALLEGRO_BITMAP *gato, ALLEGRO_BITMAP *puerta, int x, int y, float escala, cuadros f, ALLEGRO_COLOR color, ALLEGRO_BITMAP *piso, ALLEGRO_COLOR colorneblina, int laberinto[FILAS][COLUMNAS])
+ {
+    for (int alpha = 0; alpha <= 255; alpha += 5) 
+    { // Incrementa la opacidad de 0 a 255
+        dibujanivel(otravez, gato, puerta, x, y, escala, f, piso, colorneblina, laberinto);
+        ALLEGRO_COLOR color = al_map_rgba(0, 0, 0, alpha); // Color blanco con opacidad variable
+        al_draw_filled_rectangle(0, 0, LARGO, ALTO, color); // Dibuja un rectángulo blanco con opacidad variable
+        al_flip_display(); // Actualiza la pantalla
+        al_rest(0.02); // Pausa para controlar la velocidad del efecto
+    }
+    return ;
+}
+int main()
+{
+    
+    inicializar();
+
+    ALLEGRO_COLOR color;
+    ALLEGRO_DISPLAY *disp;
+    ALLEGRO_EVENT_QUEUE* eventos;
+    ALLEGRO_EVENT evento;
+    ALLEGRO_BITMAP *gato, *puerta, *piso;
+    ALLEGRO_TIMER *tempocar;
+    ALLEGRO_COLOR colorneblina;
+    int fin =0, ganaste=0, nivel_actual=1;;
+    
+    disp=al_create_display(LARGO,ALTO); //generar disp
+    al_set_window_title (disp, "Meowstellar");//nombre de la ventana
+    eventos = al_create_event_queue(); //eventos->crear cola de eventos
+    tempocar=al_create_timer(0.1);
+
+    al_register_event_source(eventos, al_get_timer_event_source(tempocar));
+    al_register_event_source(eventos, al_get_display_event_source(disp)); //¿de dónde vienen los eventos?
+    al_register_event_source(eventos,al_get_keyboard_event_source());
+    al_start_timer(tempocar);
+
+    int x=56, y=578, actual = 0, camina = 0, orienta = CABAJO, otravez = 0, a; // Inicializar variables
+    float escala = 0.185;
+    int (*laberinto_actual)[COLUMNAS] = laberinto;
+    gato=al_load_bitmap("carnaran.png");
+    puerta=al_load_bitmap("puerta.png");
+    piso=al_load_bitmap("piso.png");
+    if(!puerta)
+    {
+        printf("No se carg%c la imagen", 163);
+        fin=1;
+    }
+    if(!gato)
+    {
+        printf("No se carg%c la imagen", 163);
+        fin=1;
+    }
+    if(!piso)
+    {
+        printf("No se carg%c la imagen", 163);
+        fin=1;
+    }
+    
+    while(fin==0)
+    {
+        cuadros f = coordenadas[orienta][actual]; // Inicializar f con el cuadro actual
+        al_wait_for_event(eventos, &evento);
+        switch (evento.type)
+        {
+            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                fin = 1;
+                break;
+
+            case ALLEGRO_EVENT_TIMER:
+                if (camina)
+                    actual = (actual + 1) % 3;
+                else
+                    actual = 0;
+
+                otravez = 1;
+                break;
+
+            case ALLEGRO_EVENT_KEY_CHAR:
+                camina = 1;
+                if (evento.keyboard.keycode == 83) 
+                { // Derecha
+                    orienta = CDERECHA;
+                    if (!colision(x + 4, y, f.sw * escala, f.sh * escala, laberinto_actual)&&(!gganaste(&ganaste, x, y, nivel_actual))) // Verifica colisión
+                        x += 4;
+                }
+                if (evento.keyboard.keycode == 82) 
+                { // Izquierda
+                    orienta = CIZQUIERDA;
+                    if ((!colision(x - 4, y, f.sw * escala, f.sh * escala, laberinto_actual))&&(!gganaste(&ganaste, x, y, nivel_actual))) // Verifica colisión
+                        x -= 4;
+                }
+                if (evento.keyboard.keycode == 84)
+                { // Arriba
+                    orienta = CARRIBA;
+                    if (!colision(x, y - 4, f.sw * escala, f.sh * escala, laberinto_actual)&&(!gganaste(&ganaste, x, y, nivel_actual))) // Verifica colisión
+                        y -= 4;
+                }
+                if (evento.keyboard.keycode == 85) 
+                { // Abajo
+                    orienta = CABAJO;
+                    if (!colision(x, y + 4, f.sw * escala, f.sh * escala, laberinto_actual)&&(!gganaste(&ganaste, x, y, nivel_actual))) // Verifica colisión
+                        y += 4;
+                }
+                break;
+
+            case ALLEGRO_EVENT_KEY_UP:
+                camina = 0;
+                break;
+        }
+
+        if (otravez && al_is_event_queue_empty(eventos)) 
+        {
+            if (nivel_actual==1)
+            {
+                if(ganaste==1)
+                {
+                    mostrar_next_round(otravez, gato, puerta, x, y, escala, f, color, piso, colorneblina, laberinto_actual);
+                    nivel_actual=2;
+                    laberinto_actual = laberinto2;
+                    ganaste=0;
+                    x=56;
+                    y=578;
+                }
+                else
+                {
+                    dibujanivel(otravez, gato, puerta, x, y, escala, f, piso, colorneblina, laberinto_actual);
+                }
+            }
+            if (nivel_actual==2)
+            {
+                if(ganaste==1)
+                {
+                    mostrar_next_round(otravez, gato, puerta, x, y, escala, f, color, piso, colorneblina, laberinto_actual);
+                    laberinto_actual = laberinto3;
+                    ganaste=0;
+                    nivel_actual=3;
+                    x=56;
+                    y=578;
+                }
+                else
+                {
+                    dibujanivel(otravez, gato, puerta, x, y, escala, f, piso, colorneblina, laberinto_actual);
+                }
+            }
+            if (nivel_actual==3)
+            {
+                if(ganaste==1)
+                {
+                    mostrar_next_round(otravez, gato, puerta, x, y, escala, f, color, piso, colorneblina,laberinto_actual);
+                    ganaste=0;
+                    fin=1;
+                }
+                else
+                {
+                    dibujanivel(otravez, gato, puerta, x, y, escala, f, piso, colorneblina,laberinto_actual);
+                }
+            }
+            
+
+        }
+    }
+    al_destroy_display(disp);
+    al_destroy_event_queue(eventos);
+    al_destroy_bitmap(gato);
+
+    return 0;
+}
+
+
